@@ -1,7 +1,9 @@
 import {
   createSlice,
   PayloadAction,
+  createEntityAdapter,
 } from "@reduxjs/toolkit";
+import { fetchTodo } from "../../services/todo";
 import { fetchTodos } from "../actions";
 
 export interface ITodo {
@@ -21,6 +23,10 @@ const initialState: ITodoState = {
   isLoading: false,
   error: undefined,
 };
+
+const todosAdapter = createEntityAdapter<ITodo>({
+  selectId: (todo) => todo.id
+});
 
 const toolkitSlice = createSlice({
   name: "todos",
@@ -63,8 +69,13 @@ const toolkitSlice = createSlice({
     clearCompleted: (state) => {
       state.todos = state.todos.filter((todo) => !todo.completed);
     },
-  }
+  },
+  extraReducers: (builder) =>
+    builder
+      .addCase(fetchTodos.pending, (state, action) => {})
+      .addCase(fetchTodos.fulfilled, (state, action) => {}),
 });
 
 export default toolkitSlice.reducer;
+
 export const actions = toolkitSlice.actions;

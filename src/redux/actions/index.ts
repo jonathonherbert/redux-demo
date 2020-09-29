@@ -5,17 +5,7 @@ import { AppDispatch } from "../store";
 
 export const SET_VISIBILITY_FILTER = "SET_VISIBILITY_FILTER" as const;
 
-export const fetchTodos = (throwError: false) => async (
-  dispatch: AppDispatch
-): Promise<void> => {
-  dispatch(actions.addTodoStart());
-  try {
-    const todoMessage = await fetchTodo(throwError);
-    dispatch(actions.addTodoSuccess(todoMessage));
-  } catch (e) {
-    dispatch(actions.addTodoError(e.message));
-  }
-};
+export const fetchTodos = createAsyncThunk('fetchTodos', fetchTodo)
 
 export const setVisibilityFilter = createAction<
   string,
