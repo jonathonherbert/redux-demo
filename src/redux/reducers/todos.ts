@@ -1,70 +1,123 @@
 import {
   createSlice,
   PayloadAction,
-} from "@reduxjs/toolkit";
-import { fetchTodos } from "../actions";
+  createEntityAdapter,
+  EntityState
+} from '@reduxjs/toolkit'
+import { create } from 'domain'
+import {
+  Actions,
+  ADD_TODO_START,
+  ADD_TODO_ERROR,
+  ADD_TODO_SUCCESS,
+  DELETE_TODO,
+  EDIT_TODO,
+  COMPLETE_TODO,
+  COMPLETE_ALL_TODOS,
+  CLEAR_COMPLETED,
+  fetchTodos
+} from '../actions'
 
 export interface ITodo {
-  text: string;
-  completed: boolean;
-  id: number;
+  text: string
+  completed: boolean
+  id: number
 }
 
 export type ITodoState = {
-  todos: ITodo[];
-  isLoading: boolean;
-  error: undefined | string;
-};
+  todos: ITodo[]
+  isLoading: boolean
+  error: undefined | string
+}
+
+const todoAdapter = createEntityAdapter<ITodo>({
+  selectId: todo => todo.id
+})
 
 const initialState: ITodoState = {
   todos: [],
   isLoading: false,
-  error: undefined,
-};
+  error: undefined
+}
 
-const toolkitSlice = createSlice({
-  name: "todos",
-  initialState,
-  reducers: {
-    addTodoStart: (state) => {
-      state.isLoading = true;
-    },
-    addTodoError: (state, action: PayloadAction<string>) => {
-      state.isLoading = false;
-      state.error = action.payload;
-    },
-    addTodoSuccess: (state, action: PayloadAction<string>) => {
-      state.isLoading = false;
-      state.error = undefined;
-      state.todos.push({
-        id:
-          state.todos.reduce((maxId, todo) => Math.max(todo.id, maxId), -1) + 1,
-        completed: false,
-        text: action.payload,
-      });
-    },
-    deleteTodo: (state, action: PayloadAction<number>) => {
-      state.todos = state.todos.filter((todo) => todo.id !== action.payload);
-    },
-    editTodo: (state, action: PayloadAction<{ id: number; text: string }>) => {
-      const [todo] = state.todos.filter(
-        (todo) => todo.id === action.payload.id
-      );
-      todo.text = action.payload.text;
-    },
-    completeTodo: (state, action: PayloadAction<number>) => {
-      const [todo] = state.todos.filter((todo) => todo.id === action.payload);
-      todo.completed = !todo.completed;
-    },
-    completeAllTodos: (state) => {
-      const areAllMarked = state.todos.every((todo) => todo.completed);
-      state.todos.forEach((todo) => (todo.completed = !areAllMarked));
-    },
-    clearCompleted: (state) => {
-      state.todos = state.todos.filter((todo) => !todo.completed);
-    },
+export default function todos(state = initialState, action: Actions) {
+  switch (action.type) {
+    case ADD_TODO_START:
+      return {
+        ...state,
+        isLoading: true,
+      }
+    case ADD_TODO_ERROR:
+      return {
+        ...state,
+        isLoading: false,
+        error: action.payload
+      }
+    case ADD_TODO_SUCCESS:
+      return {
+        ...state,
+        error: undefined,
+        isLoading: false,
+        todos: [
+          ...state.todos,
+          {
+            id:
+              state.todos.reduce(
+                (maxId, todo) => Math.max(todo.id, maxId),
+                -1
+              ) + 1,
+            completed: false,
+            text: action.payload.text
+          }
+        ]
+      }
+
+    case DELETE_TODO:
+      return {
+        ...state,
+        todos: state.todos.filter(todo => todo.id !== action.payload.id)
+      }
+
+    case EDIT_TODO:
+      return {
+        ...state,
+        todos: state.todos.map(todo =>
+          todo.id === action.payload.id
+            ? { ...todo, text: action.payload.text }
+            : todo
+        )
+      }
+
+    case COMPLETE_TODO:
+      return {
+        ...state,
+        todos: state.todos.map(todo =>
+          todo.id === action.payload.id
+            ? { ...todo, completed: !todo.completed }
+            : todo
+        )
+      }
+
+    case COMPLETE_ALL_TODOS:
+      const areAllMarked = state.todos.every(todo => todo.completed)
+      return {
+        ...state,
+        todos: state.todos.map(todo => ({
+          ...todo,
+          completed: !areAllMarked
+        }))
+      }
+
+    case CLEAR_COMPLETED:
+      return {
+        ...state,
+        todos: state.todos.filter(todo => todo.completed === false)
+      }
+
+    default:
+      return state
   }
-});
+}
 
-export default toolkitSlice.reducer;
-export const actions = toolkitSlice.actions;
+
+

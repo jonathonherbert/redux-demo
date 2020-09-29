@@ -1,5 +1,5 @@
 import todos, { ITodo } from "./todos";
-import { actions } from "./todos";
+import * as actions from "../actions";
 
 const initialState = {
   todos: [],
@@ -13,11 +13,11 @@ export const addTodosToState = (todos: ITodo[]) => ({
 });
 
 describe("todos reducer", () => {
-  it("should handle addTodoSuccess", () => {
+  it("should handle ADD_TODO_SUCCESS", () => {
     expect(
       todos(initialState, {
-        type: actions.addTodoSuccess,
-        payload: "Run the tests",
+        type: actions.ADD_TODO_SUCCESS,
+        payload: { text: "Run the tests" },
       }).todos
     ).toEqual([
       {
@@ -40,8 +40,8 @@ describe("todos reducer", () => {
           ],
         },
         {
-          type: actions.addTodoSuccess,
-          payload: "Run the tests",
+          type: actions.ADD_TODO_SUCCESS,
+          payload: { text: "Run the tests" },
         }
       ).todos
     ).toEqual([
@@ -72,8 +72,8 @@ describe("todos reducer", () => {
           },
         ]),
         {
-          type: actions.addTodoSuccess,
-          payload: "Fix the tests",
+          type: actions.ADD_TODO_SUCCESS,
+          payload: { text: "Fix the tests" },
         }
       ).todos
     ).toEqual([
@@ -111,8 +111,8 @@ describe("todos reducer", () => {
           },
         ]),
         {
-          type: actions.deleteTodo,
-          payload: 1,
+          type: actions.DELETE_TODO,
+          payload: { id: 1 },
         }
       ).todos
     ).toEqual([
@@ -140,7 +140,7 @@ describe("todos reducer", () => {
           },
         ]),
         {
-          type: actions.editTodo,
+          type: actions.EDIT_TODO,
           payload: { text: "Fix the tests", id: 1 },
         }
       ).todos
@@ -174,8 +174,8 @@ describe("todos reducer", () => {
           },
         ]),
         {
-          type: actions.completeTodo,
-          payload: 1,
+          type: actions.COMPLETE_TODO,
+          payload: { id: 1 },
         }
       ).todos
     ).toEqual([
@@ -208,7 +208,7 @@ describe("todos reducer", () => {
           },
         ]),
         {
-          type: actions.completeAllTodos,
+          type: actions.COMPLETE_ALL_TODOS,
         }
       ).todos
     ).toEqual([
@@ -240,7 +240,7 @@ describe("todos reducer", () => {
           },
         ]),
         {
-          type: actions.completeAllTodos,
+          type: actions.COMPLETE_ALL_TODOS,
         }
       ).todos
     ).toEqual([
@@ -273,7 +273,7 @@ describe("todos reducer", () => {
           },
         ]),
         {
-          type: actions.clearCompleted,
+          type: actions.CLEAR_COMPLETED,
         }
       ).todos
     ).toEqual([
@@ -289,16 +289,14 @@ describe("todos reducer", () => {
     expect(
       [
         {
-          type: actions.completeTodo,
-          payload: 0,
-        },
-        {
-          type: actions.clearCompleted,
-        },
-        {
-          type: actions.addTodoSuccess,
-          payload: "Write more tests",
-        },
+          type: types.COMPLETE_TODO,
+          id: 0
+        }, {
+          type: types.CLEAR_COMPLETED
+        }, {
+          type: types.ADD_TODO,
+          text: 'Write more tests'
+        }
       ].reduce(
         todos,
         addTodosToState([
