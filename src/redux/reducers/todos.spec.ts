@@ -4,7 +4,7 @@ import * as actions from "../actions";
 const initialState = {
   todos: [],
   isLoading: false,
-  error: undefined
+  error: undefined,
 };
 
 export const addTodosToState = (todos: ITodo[]) => ({
@@ -289,14 +289,16 @@ describe("todos reducer", () => {
     expect(
       [
         {
-          type: types.COMPLETE_TODO,
-          id: 0
-        }, {
-          type: types.CLEAR_COMPLETED
-        }, {
-          type: types.ADD_TODO,
-          text: 'Write more tests'
-        }
+          type: actions.COMPLETE_TODO,
+          payload: { id: 0 },
+        },
+        {
+          type: actions.CLEAR_COMPLETED,
+        },
+        {
+          type: actions.ADD_TODO_SUCCESS,
+          payload: { text: "Write more tests" },
+        },
       ].reduce(
         todos,
         addTodosToState([

@@ -1,4 +1,5 @@
 import { fetchTodo } from '../../services/todo'
+import { AppDispatch } from '../store'
 
 export const ADD_TODO_START = 'ADD_TODO_START' as const
 export const ADD_TODO_ERROR = 'ADD_TODO_ERROR' as const
@@ -10,16 +11,25 @@ export const COMPLETE_ALL_TODOS = 'COMPLETE_ALL_TODOS' as const
 export const CLEAR_COMPLETED = 'CLEAR_COMPLETED' as const
 export const SET_VISIBILITY_FILTER = 'SET_VISIBILITY_FILTER' as const
 
-export const fetchTodos = createAsyncThunk('todos/fetchTodos', (throwError: false) => fetchTodo(throwError))
+export const fetchTodos = (throwError: false) => async (
+  dispatch: AppDispatch
+): Promise<void> => {
+  dispatch(addTodoStart());
+  try {
+    const todoMessage = await fetchTodo(throwError);
+    dispatch(addTodoSuccess(todoMessage));
+  } catch (e) {
+    dispatch(addTodoError(e.message));
+  }
+};
 
-export const addTodoStart = (text: string) => ({
-  type: ADD_TODO_START,
-  payload: { text }
+export const addTodoStart = () => ({
+  type: ADD_TODO_START
 })
 
 export const addTodoError = (text: string) => ({
   type: ADD_TODO_ERROR,
-  payload: { text }
+  payload: text
 })
 export const addTodoSuccess = (text: string) => ({
   type: ADD_TODO_SUCCESS,

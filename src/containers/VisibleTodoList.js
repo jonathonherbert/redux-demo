@@ -1,7 +1,6 @@
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as todoActions from "../redux/actions";
-import { actions } from "../redux/reducers/todos";
 import TodoList from "../components/TodoList";
 import { getIsLoading, getVisibleTodos } from "../redux/selectors";
 
@@ -11,7 +10,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  actions: bindActionCreators({ ...todoActions, ...actions }, dispatch),
+  actions: bindActionCreators(todoActions, dispatch),
 });
 
 const VisibleTodoList = connect(mapStateToProps, mapDispatchToProps)(TodoList);
